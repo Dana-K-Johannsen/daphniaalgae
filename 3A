@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#the command SBATCH stands for submit batch and means that we are submitting jobs to Rivanna (these jobs are non-interactive, so we don't need to stay connected while they run
 #SBATCH -J makebams    # Job name
 #SBATCH --ntasks=1        # Single task per job
 #SBATCH --cpus-per-task=10 # Number of CPU cores per task
@@ -11,8 +12,15 @@
 #SBATCH --account=berglandlab
 
 # Load necessary modules
+
+#htslib is a C library used for reading and writing high-volume sequencing data (supports standard genomic formats)
+#gcc is a set of compilers
 module load gcc htslib
+
+#the SRA toolkit is a suite of command-line tools used to access, download, or manipulate SRA (sequence read archive) data
 module load sratoolkit/3.1.1
+
+#trimmomatic allows you to trim and clean raw sequencing data (specifically NGS)
 module load trimmomatic
 module load bwa
 module load samtools
