@@ -1,0 +1,30 @@
+module load gatk
+
+
+samtools faidx /scratch/rjp5nc/Reference_genomes/chlorella_ref/GCA_023343905.1_cvul_genomic.fa
+
+gatk CreateSequenceDictionary \
+   -R /scratch/rjp5nc/Reference_genomes/chlorella_ref/GCA_023343905.1_cvul_genomic.fa \
+   -O /scratch/rjp5nc/Reference_genomes/chlorella_ref/GCA_023343905.1_cvul_genomic.dict
+
+java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+-I /scratch/rjp5nc/microbiota/chlorella/fastq/chlorella_Reed_finalmap.bam \
+-O /scratch/rjp5nc/microbiota/chlorella/fastq/chlorella_Reed_finalmap_RG.bam \
+-LB "library" \
+-PL "ILLumina" \
+-PU "platunit" \
+-SM chlorella_reed
+
+# Index Bam files
+java -jar $EBROOTPICARD/picard.jar BuildBamIndex \
+-I /scratch/rjp5nc/microbiota/chlorella/fastq/chlorella_Reed_finalmap_RG.bam
+
+
+
+#Need to make gvcf files of more than just one bam file
+
+gatk HaplotypeCaller \
+-R ${ref_path} \
+-I /scratch/rjp5nc/microbiota/chlorella/fastq/chlorella_Reed_finalmap_RG.bam \
+-O /scratch/rjp5nc/microbiota/chlorella/fastq/chlorella_Reed.g.vcf \
+-ERC GVCF
