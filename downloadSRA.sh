@@ -9,6 +9,7 @@
 #SBATCH -e /scratch/gpk3qr/compBio/logs/prefetch.%A_%a.err # Standard error
 #SBATCH -p standard
 #SBATCH --account berglandlab_standard
+#SBATCH --array=1-167
 
 wd=/scratch/qpk3qr/compBio
 ### run as: sbatch --array=1-$( wc -l < /project/berglandlab/Dana/metadata/oldalgaepaths.csv )%10 ~/daphnia_algae/downloadSRA.sh
