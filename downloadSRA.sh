@@ -74,5 +74,5 @@ if [ -f "/scratch/gpk3qr/compBio/fastq/${sranum}" ]; then
   rm /scratch/gpk3qr/compBio/fastq/${sranum}
 fi
 
-rm /scratch/gpk3qr/fastq/${sranum}.sra
+rm /scratch/gpk3qr/sra/${sranum}.sra
 #cat /home/gpk3qr/CompEvoBio_modules/data/runs.csv | nl | grep "SRR12463313"
