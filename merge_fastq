@@ -23,8 +23,8 @@ cd "$sample_dir" || exit 1
 
 
 :<<SRR_samples
-infq="/scratch/ejy4bu/compBio/fastq"
-#sample_folders="/scratch/ejy4bu/compBio/fastq"
+infq="/scratch/gpk3qr/compBio/fastq"
+#sample_folders="/scratch/gpk3qr/compBio/fastq"
 cd "$sample_folders" || exit
 # Loop through all subdirectories
 for folder in ${infq}/*; do
