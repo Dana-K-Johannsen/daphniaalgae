@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#
+#SBATCH -J merge # A single job name for the array
+#SBATCH --array=0-166
+#SBATCH --ntasks=1
+#SBATCH -N 1 # on one node
+#SBATCH -t 2-10:00 # 10 hours
+#SBATCH --mem 100G
+#SBATCH -o /scratch/gpk3qr/erroroutputs/down.%A_%a.out # Standard output
+#SBATCH -e /scratch/gpk3qr/erroroutputs/down.%A_%a.err # Standard error
+#SBATCH -p standard
+#SBATCH --account=berglandlab
+
+# Load necessary modules
+module load gzip
+
+# Dynamically get list of folders
+folders=($(find "$sample_folders" -mindepth 1 -maxdepth 1 -type d | sort))
+sample_dir="${folders[$SLURM_ARRAY_TASK_ID]}"
+samp=$(basename "$sample_dir")
+
+echo "Processing sample: $samp"
+cd "$sample_dir" || { echo "Failed to enter $sample_dir"; exit 1; }
+
+# Merge forward reads
+if ls *_1.P.trimm.fastq 1> /dev/null 2>&1; then
+    echo "Merging forward reads..."
+    cat *_1.P.trimm.fastq | gzip > "${samp}_trimmedmerged1.fq.gz"
+    rm *_1.P.trimm.fastq *_1.fastq
+else
+    echo "Warning: No forward reads found in $samp"
+fi
+
+# Merge reverse reads
+if ls *_2.P.trimm.fastq 1> /dev/null 2>&1; then
+    echo "Merging reverse reads..."
+    cat *_2.P.trimm.fastq | gzip > "${samp}_trimmedmerged2.fq.gz"
+    rm *_2.P.trimm.fastq *_2.fastq
+else
+    echo "Warning: No reverse reads found in $samp"
+fi
+
+echo "Done merging $samp"

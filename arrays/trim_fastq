@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+#SBATCH -J trimSRA                  # Job name
+#SBATCH --ntasks-per-node=10       # Number of cores
+#SBATCH -N 1                        # One node
+#SBATCH -t 0-10:00                  # Runtime (10 hours)
+#SBATCH --mem=100G                 # Memory allocation
+#SBATCH -o /scratch/gpk3qr/erroroutputs/down.%A_%a.out  # Standard output
+#SBATCH -e /scratch/gpk3qr/erroroutputs/down.%A_%a.err  # Standard error
+#SBATCH -p standard
+#SBATCH --account=berglandlab
+#SBATCH --array=0-164%10           # Array range (165 folders after skipping 2)
+
+# Load required modules
+module load trimmomatic
+module load pear
+
+# Define parent directory
+PARENT_DIR="/scratch/gpk3qr/compBio/fastq"
+
+# Get list of all folders and skip the first two
+FOLDERS=($(ls -d ${PARENT_DIR}/*/))
+FOLDERS=("${FOLDERS[@]:2}")
+
+# Select folder based on array index
+FOLDER="${FOLDERS[$SLURM_ARRAY_TASK_ID]}"
+if [ -z "$FOLDER" ]; then
+  echo "No folder found for task ID $SLURM_ARRAY_TASK_ID"
+  exit 1
+fi
+
+echo "Total folders to process: ${#FOLDERS[@]}"
+echo "Processing folder: $FOLDER"
+
+# Extract folder name
+FOLDER_NAME=$(basename "$FOLDER")
+
+# Change to working directory
+cd "$FOLDER" || exit 1
+
+# Check for FASTQ files
+if ls *_1.fastq *_2.fastq 1> /dev/null 2>&1; then
+    echo "Found FASTQ files in $FOLDER_NAME"
+
+    # Identify input files
+    R1=$(ls *_1.fastq)
+    R2=$(ls *_2.fastq)
+
+    # Run Trimmomatic
+    trimmomatic PE -threads 10 \
+        "$R1" "$R2" \
+        "${FOLDER_NAME}_1.P.trimm.fastq" "${FOLDER_NAME}_1.U.trimm.fastq" \
+        "${FOLDER_NAME}_2.P.trimm.fastq" "${FOLDER_NAME}_2.U.trimm.fastq" \
+        ILLUMINACLIP:/home/gpk3qr/TruSeq3-PE.fa:2:30:10:8:true
+
+    # Run PEAR
+    pear -f "${FOLDER_NAME}_1.P.trimm.fastq" \
+         -r "${FOLDER_NAME}_2.P.trimm.fastq" \
+         -o "${FOLDER_NAME}_pear" \
+         -j 10
+else
+    echo "Warning: No FASTQ files found in $FOLDER_NAME"
+fi
