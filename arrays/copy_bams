@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=copy_bams
+#SBATCH --output=copy_bams_%j.out
+#SBATCH --error=copy_bams_%j.err
+#SBATCH --time=02:00:00
+#SBATCH --partition=standard
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=8G
+
+# Create destination directory if it doesn't exist
+mkdir -p /scratch/gpk3qr/mapped_bams_new
+
+# Copy all SRR folders from source to destination
+cp -r /project/berglandlab/chlorella_sequencing/bams/bams/Robert_samples_bams/* /scratch/gpk3qr/mapped_bams_new/
+

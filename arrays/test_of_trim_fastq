@@ -20,23 +20,24 @@ FOLDERS=($(ls -d ${PARENT_DIR}/*/))
 FOLDERS=("${FOLDERS[@]:2}")
 # Array of folder paths
 # Select the folder based on the job array index
-FOLDER="${FOLDERS[$SLURM_ARRAY_TASK_ID - 1]}"
+FOLDER="${FOLDERS[$SLURM_ARRAY_TASK_ID]}"
 if [ -z "$FOLDER" ]; then
   echo "No folder found for task ID $SLURM_ARRAY_TASK_ID"
   exit 1
 fi
 echo "Total folders found: ${#FOLDERS[@]}"
 # Extract folder name
-FOLDER_NAME=$(basename "$FOLDER")
+FOLDER_NAME=$(basename "${FOLDER%/}")
 # Change to the working directory
 cd "$FOLDER" || exit 1
 # Check if fastq.gz files exist
-if ls *.fastq 1> /dev/null 2>&1; then
+if ls *_1.fastq 1> /dev/null 2>&1 && ls *_2.fastq 1> /dev/null 2>&1; then
     echo "Processing $FOLDER_NAME"
+    R1=$(ls *_1.fastq)
+    R2=$(ls *_2.fastq)
     # Run Trimmomatic
     trimmomatic PE -threads 10 \
-        ${FOLDER_NAME}_1.fastq \
-        ${FOLDER_NAME}_2.fastq \
+        "$R1" "$R2" \
         ${FOLDER_NAME}_1.P.trimm.fastq \
         ${FOLDER_NAME}_1.U.trimm.fastq \
         ${FOLDER_NAME}_2.P.trimm.fastq \
