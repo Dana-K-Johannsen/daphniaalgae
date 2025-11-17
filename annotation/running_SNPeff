@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=snpeff_chlorella
+#SBATCH -o /scratch/gpk3qr/erroroutputs/snpeff.%A.out
+#SBATCH -e /scratch/gpk3qr/erroroutputs/snpeff.%A.err
+#SBATCH --time=08:00:00
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=4
+#SBATCH --partition=standard
+
+module load java
+
+SNPEFF_DIR=$HOME/snpEff
+VCF_IN="/project/berglandlab/chlorella_sequencing/combined_chlorella.vcf.gz"
+VCF_OUT="/project/berglandlab/chlorella_sequencing/combined_chlorella_annotated.vcf"
+
+java -Xmx32g -jar $SNPEFF_DIR/snpEff.jar -v chlorella $VCF_IN > $VCF_OUT

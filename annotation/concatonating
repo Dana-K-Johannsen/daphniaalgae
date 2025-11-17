@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --job-name=concat_vcfs
+#SBATCH -o /scratch/gpk3qr/erroroutputs/down.%A_%a.out  # Standard output
+#SBATCH -e /scratch/gpk3qr/erroroutputs/down.%A_%a.err  # Standard error
+#SBATCH --time=01:00:00
+#SBATCH --mem=8G
+#SBATCH --cpus-per-task=2
+#SBATCH --partition=standard
+
+# Load required modules
+module load bcftools
+
+# Define input and output directories
+VCF_DIR="/project/berglandlab/chlorella_sequencing/vcfs"
+OUTPUT_VCF="/project/berglandlab/chlorella_sequencing/combined_chlorella.vcf.gz"
+
+# Create a list of VCF files
+VCF_LIST=$(ls ${VCF_DIR}/*.vcf.gz | sort)
+
+# Concatenate VCFs using bcftools
+bcftools concat -a -O z -o ${OUTPUT_VCF} ${VCF_DIR}/*.vcf.gz
+
+# Index the final VCF (optional but recommended for SNPeff)
+bcftools index ${OUTPUT_VCF}

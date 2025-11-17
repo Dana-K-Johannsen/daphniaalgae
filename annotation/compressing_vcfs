@@ -1,0 +1,25 @@
+#!/bin/bash
+#SBATCH --job-name=bgzip_vcfs
+#SBATCH --output=/scratch/gpk3qr/erroroutputs/bgzip.%A_%a.out
+#SBATCH --error=/scratch/gpk3qr/erroroutputs/bgzip.%A_%a.err
+#SBATCH --time=00:30:00
+#SBATCH --mem=2G
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=standard
+#SBATCH --array=0-13   # Adjust this range to match the number of VCFs
+
+# Load htslib (bgzip/tabix are usually included)
+module load htslib
+
+# Directory containing VCFs
+VCF_DIR="/project/berglandlab/chlorella_sequencing/vcfs"
+
+# Create an array of VCF files
+VCF_FILES=(${VCF_DIR}/*.vcf)
+
+# Select the file for this array task
+VCF_FILE=${VCF_FILES[$SLURM_ARRAY_TASK_ID]}
+
+# Compress and index
+bgzip -c "$VCF_FILE" > "${VCF_FILE}.gz"
+tabix -p vcf "${VCF_FILE}.gz"
