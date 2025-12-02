@@ -7,5 +7,5 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --partition=standard
 
-module load R   
+module load R/4.3.1
 Rscript vcf_to_gds.R
