@@ -7,5 +7,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --partition=standard
 
-module load R/4.3.1
+module load gcc/11.4.0 openmpi/4.1.4 R/4.3.1
+export R_LIBS_USER=~/Rlibs
+
 Rscript vcf_to_gds.R

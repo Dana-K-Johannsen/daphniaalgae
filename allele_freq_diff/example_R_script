@@ -1,0 +1,16 @@
+# Load GDS
+genofile <- snpgdsOpen("combined_chlorella_annotated.gds")
+
+# Calculate allele frequencies
+afreq <- snpgdsAlleleFreq(genofile)
+
+# defining specific groups (example)
+group1_ids <- c("sample1", "sample2", "sample3")
+group2_ids <- c("sample4", "sample5", "sample6")
+
+# Get allele frequencies per group
+afreq_group1 <- snpgdsAlleleFreq(genofile, sample.id = group1_ids)
+afreq_group2 <- snpgdsAlleleFreq(genofile, sample.id = group2_ids)
+
+# calculating differences between specific groups
+diff <- afreq_group1$AlleleFreq - afreq_group2$AlleleFreq
